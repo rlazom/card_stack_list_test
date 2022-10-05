@@ -5,4 +5,5 @@ enum CardType {
 enum Currency {
   cup,
   mlc,
+  usd,
 }

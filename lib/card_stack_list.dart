@@ -9,6 +9,7 @@ import 'card_wdt.dart';
 class CardStackList extends StatelessWidget {
   final List cardList;
   final int cardStackNumber;
+  final double stackOfCardsPadding;
   final GlobalKey stickyKey = GlobalKey();
   final currentTrendingMovieIdNotifier = ValueNotifier<double>(0.0);
   final PageController controller = PageController(
@@ -17,7 +18,12 @@ class CardStackList extends StatelessWidget {
     initialPage: 0,
   );
 
-  CardStackList({super.key, required this.cardList, this.cardStackNumber = 1}) {
+  CardStackList({
+    super.key,
+    required this.cardList,
+    this.cardStackNumber = 1,
+    this.stackOfCardsPadding = 16.0,
+  }) {
     controller.addListener(_pageListener);
   }
 
@@ -55,16 +61,9 @@ class CardStackList extends StatelessWidget {
                       //       '_percent: $percent, ');
                       // }
 
-                      // int bottomMaxStackOfCards = 4;
-                      int bottomMaxStackOfCards = cardStackNumber;
-                      // double stackOfCardsPadding = 0.02;
-                      double stackOfCardsPadding = 16.0;
-                      // const double horizontalPaddingOnStack = 12;
-                      // final double horizontalPaddingOnStack = 7.5 * min / 100;
-                      // print('horizontalPaddingOnStack: "$horizontalPaddingOnStack"');
-
-                      final double distanceBetweenCurrentStack = 4 * min / 100;
-                      // print('distanceBetweenCurrentStack: "$distanceBetweenCurrentStack"');
+                      final double distanceBetweenCurrentAndStack =
+                          4 * min / 100;
+                      // print('distanceBetweenCurrentAndStack: "$distanceBetweenCurrentAndStack"');
 
                       List<Widget> stackOfCards = [];
 
@@ -80,11 +79,16 @@ class CardStackList extends StatelessWidget {
                               : 1 -
                                   (percent - topCardOpacityFrom) /
                                       (1 - topCardOpacityFrom),
-                          child: CardWdt(
-                            key: stickyKey,
-                            up: true,
-                            child: cardList.elementAt(index),
-                            percent: -percent,
+                          child: InkWell(
+                            onTap: () {
+                              print('CURRENT');
+                            },
+                            child: CardWdt(
+                              key: stickyKey,
+                              up: true,
+                              child: cardList.elementAt(index),
+                              percent: -percent,
+                            ),
                           ),
                         ),
                       ));
@@ -106,14 +110,12 @@ class CardStackList extends StatelessWidget {
                       }
 
                       double posIni =
-                          cardWdtHeight + distanceBetweenCurrentStack;
+                          cardWdtHeight + distanceBetweenCurrentAndStack;
                       double posEnd = 0.0;
                       ////////////////////////////////////////////////////////////
 
                       /// BOTTOM CARDS
-                      for (int i = 1; i <= bottomMaxStackOfCards; i++) {
-                        // print('i: "$i", posIni: "$posIni", posEnd: "$posEnd"');
-
+                      for (int i = 1; i <= cardStackNumber; i++) {
                         if (index < cardList.length - i) {
                           stackOfCards.add(Transform.scale(
                             scale:
@@ -121,8 +123,6 @@ class CardStackList extends StatelessWidget {
                             child: Padding(
                               padding: EdgeInsets.only(
                                 top: lerpDouble(posIni, posEnd, percent)!,
-                                bottom: i != bottomMaxStackOfCards ? 0 : lerpDouble(0,posIni-posEnd, percent)!,
-                                // bottom: cardWdtHeight + (posIni + stackOfCardsPadding) - lerpDouble(posIni, posEnd, percent)!,
                               ),
                               child: CardWdt(
                                 child: cardList.elementAt(index + i),
@@ -132,67 +132,32 @@ class CardStackList extends StatelessWidget {
                               ),
                             ),
                           ));
-
-                          // if (i == bottomMaxStackOfCards) {
-                          //   stackOfCards.add(SizedBox(
-                          //     height: cardWdtHeight + (posIni + stackOfCardsPadding) - lerpDouble(posIni, posEnd, percent)!,
-                          //   ));
-                          // }
-                        } else {
-                          stackOfCards.add(SizedBox(
-                              height: cardWdtHeight +
-                                  (posIni + stackOfCardsPadding)));
                         }
                         posEnd = posIni;
                         posIni = posEnd + stackOfCardsPadding;
                       }
+                      stackOfCards.add(SizedBox(
+                        height: cardWdtHeight + (posEnd + stackOfCardsPadding),
+                      ));
 
                       /// BOTTOM - LAST card
-                      if (index <
-                          cardList.length - (bottomMaxStackOfCards + 1)) {
-                        // stackOfCards.add(Transform.scale(
-                        //   scale: 0.89,
-                        //   child: Padding(
-                        //     padding: EdgeInsets.only(
-                        //       top: lerpDouble((posIni + stackOfCardsPadding),
-                        //           posEnd, percent)!,
-                        //       // top: lerpDouble(posIni, posEnd, percent)!,
-                        //       bottom: ((posIni + stackOfCardsPadding)) -
-                        //           lerpDouble((posIni + stackOfCardsPadding),
-                        //               posEnd, percent)!,
-                        //     ),
-                        //     child: Opacity(
-                        //       opacity: lerpDouble(0, 1, percent)!,
-                        //       child: CardWdt(
-                        //         child: cardList.elementAt(index + 3),
-                        //         percent: 1,
-                        //         text: '$index',
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ));
-                        // double kbottom = (cardWdtHeight + 4 + (posEnd + stackOfCardsPadding)) - lerpDouble((posIni + stackOfCardsPadding), posEnd, percent)! - 144;
+                      if (index < cardList.length - (cardStackNumber + 1)) {
                         stackOfCards.add(Transform.translate(
+                          // offset: Offset(0, lerpDouble(posIni + stackOfCardsPadding, posEnd - stackOfCardsPadding, percent)! - 1.00),
                           offset: Offset(
                               0,
                               lerpDouble(posIni + stackOfCardsPadding,
-                                      posEnd - stackOfCardsPadding, percent)! -
-                                  0.15),
-                          // offset: Offset(0, (posIni + stackOfCardsPadding)),      /// POSICION INICIAL
-                          // offset: Offset(0, (posEnd - stackOfCardsPadding)),   /// POSICION FINAL
-                          // offset: Offset(0, 0),
+                                  posEnd - stackOfCardsPadding, percent)!),
                           child: Transform.scale(
                             scale: 0.85,
                             child: Opacity(
                               opacity: lerpDouble(0, 1, percent)!,
                               // opacity: 1,
                               child: CardWdt(
-                                child: cardList
-                                    .elementAt(bottomMaxStackOfCards + 1),
+                                child: cardList.elementAt(cardStackNumber + 1),
                                 percent: 1,
                                 // percent: 0,
                                 text: '$index',
-                                // text: 'bottom',
                               ),
                             ),
                           ),
@@ -202,7 +167,7 @@ class CardStackList extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Container(
-                          color: Colors.red,
+                          // color: Colors.red,
                           child: Stack(
                               alignment: Alignment.topCenter,
                               children: stackOfCards.reversed.toList()),
@@ -217,11 +182,19 @@ class CardStackList extends StatelessWidget {
                       // String value = cardList.elementAt(index);
 
                       return InkWell(
-                        onTap: () {
+                        onTap: (){
                           print('index: $index');
+                          controller.animateToPage(index + 1,
+                              duration:
+                              const Duration(milliseconds: 500),
+                              curve: Curves.easeIn);
                         },
-                        // child: CardWdt(value: value),
                         child: const SizedBox.shrink(),
+                        // child: Container(
+                        //   color: Colors.blue,
+                        //   width: 20,
+                        //   height: 20,
+                        // ),
                       );
                     })
               ],

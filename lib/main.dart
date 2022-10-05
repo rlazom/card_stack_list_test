@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cards_app/card_stack_list.dart';
 import 'package:cards_app/cards_ui/card_metropolitano_wdt.dart';
 import 'package:cards_app/enums.dart';
@@ -37,74 +39,27 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Map<String, dynamic>> cardList = [];
+  Random random = Random();
 
   @override
   void initState() {
-    cardList = [
-      {
+    final int max = int.parse('1'.padRight(8,'0'));
+    // int randomNumber = random.nextInt(max)+max;
+    // print('max: "$max", max.length: ${max.toString().length}, randomNumber: "$randomNumber" - randomNumber.length: ${randomNumber.toString().length}');
+
+    for(int i=0; i<10; i++) {
+      int randomNumber1 = random.nextInt(max)+max;
+      int randomNumber2 = random.nextInt(max)+max;
+
+      Map<String, dynamic> valueMap = {
         'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo Mendez',
-        'number': '9225959877775555',
+        'currency': Currency.usd,
+        'holder': 'NAME LAST NAME',
+        'number': '$randomNumber1$randomNumber2',
         'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        // 'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959811163311',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959888162200',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959877001188',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959844667700',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959874164422',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959888167566',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959874167517',
-        'expiry_date': '11/30'
-      },
-      {
-        'type': CardType.metropolitano,
-        'currency': Currency.mlc,
-        'holder': 'Rene Lazo',
-        'number': '9225959874167518',
-        'expiry_date': '11/30'
-      },
-    ];
+      };
+      cardList.add(valueMap);
+    }
 
     super.initState();
   }
@@ -128,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            color: Colors.amber,
+            // color: Colors.amber,
             // height: 400,
             // width: 200,
             child: CardStackList(
